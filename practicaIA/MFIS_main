@@ -1,6 +1,6 @@
 import numpy as np
 import skfuzzy as skf
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 from MFIS_Read_Functions import *
 from MFIS_Classes import *
 
@@ -15,11 +15,18 @@ from MFIS_Classes import *
 
 
 class main:
-    def __init__():
+    def __init__(self):
         pass
 
-    a = readRulesFile()
-    a.printRuleList
+    lista_reglas = readRulesFile()
+    lista_reglas.printRuleList()
+
+    lista_app = readApplicationsFile()
+
+    dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
+    dic_fuzz.printFuzzySetsDict()
+
+    for i in 
 
 main()
 
