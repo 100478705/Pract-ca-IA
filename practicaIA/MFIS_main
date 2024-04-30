@@ -1,0 +1,27 @@
+import numpy as np
+import skfuzzy as skf
+import matplotlib.pyplot as plt
+from MFIS_Read_Functions import *
+from MFIS_Classes import *
+
+
+#lista_reglas = readRulesFile
+#lista_aplicaciones = readApplicationsFile
+#lista_fuzzy = readFuzzySetsFile('Files/InputVarSets.txt')
+
+#print(str(lista_reglas),"\n", str(lista_aplicaciones), "\n")
+
+
+
+
+class main:
+    def __init__():
+        pass
+
+    a = readRulesFile()
+    a.printRuleList
+
+main()
+
+
+

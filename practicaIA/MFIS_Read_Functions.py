@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-#import numpy as np
-#import skfuzzy as skf
-#import matplotlib.pyplot as plt
+import numpy as np
+import skfuzzy as skf
+import matplotlib.pyplot as plt
 from MFIS_Classes import *
 
 def readFuzzySetsFile(fleName):
