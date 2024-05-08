@@ -15,20 +15,25 @@ class main:
     lista_app = readApplicationsFile()
 
     dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
-    dic_fuzz.printFuzzySetsDict()
+    #dic_fuzz.printFuzzySetsDict()
     #print (lista_app)
     for app in lista_app:
+        i = 0
         for dic_key in dic_fuzz.keys():
-            for i in app.data:
+            while i <= len(app.data):
                 fuzz = dic_fuzz.get(dic_key)
-                if app.data[i] == fuzz.var:
-                    value = app.data[i+1]
+                if app.data[i-1] == fuzz.var:
+                    value = app.data[i]
+                    print (value)
                     for n in fuzz.x:
-                        if value == fuzz.x[i]:
-                            value = fuzz.y[i]
+                        if value == fuzz.x[n]:
+                            value = fuzz.y[n]
+                            print (value)
                         else:
-                            i += 1
-                    
+                            n += 1
+                else:
+                    i += 1
+
 
 
         #for 
