@@ -5,28 +5,36 @@ from MFIS_Read_Functions import *
 from MFIS_Classes import *
 
 
-#lista_reglas = readRulesFile
-#lista_aplicaciones = readApplicationsFile
-#lista_fuzzy = readFuzzySetsFile('Files/InputVarSets.txt')
-
-#print(str(lista_reglas),"\n", str(lista_aplicaciones), "\n")
-
-
-
-
 class main:
     def __init__(self):
         pass
 
     lista_reglas = readRulesFile()
-    lista_reglas.printRuleList()
+    #lista_reglas.printRuleList()
 
     lista_app = readApplicationsFile()
 
     dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
     dic_fuzz.printFuzzySetsDict()
+    #print (lista_app)
+    for app in lista_app:
+        for dic_key in dic_fuzz.keys():
+            for i in app.data:
+                fuzz = dic_fuzz.get(dic_key)
+                if app.data[i] == fuzz.var:
+                    value = app.data[i+1]
+                    for n in fuzz.x:
+                        if value == fuzz.x[i]:
+                            value = fuzz.y[i]
+                        else:
+                            i += 1
+                    
 
-    for i in 
+
+        #for 
+        #app.printApplication()
+
+         
 
 main()
 
