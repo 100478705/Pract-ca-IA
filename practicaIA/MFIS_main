@@ -5,43 +5,32 @@ from MFIS_Read_Functions import *
 from MFIS_Classes import *
 
 
-class main:
-    def __init__(self):
-        pass
-
-    lista_reglas = readRulesFile()
-    #lista_reglas.printRuleList()
-
-    lista_app = readApplicationsFile()
-
-    dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
-    #dic_fuzz.printFuzzySetsDict()
-    #print (lista_app)
-    for app in lista_app:
-        i = 0
-        for dic_key in dic_fuzz.keys():
-            while i <= len(app.data):
-                fuzz = dic_fuzz.get(dic_key)
-                if app.data[i-1] == fuzz.var:
-                    value = app.data[i]
-                    print (value)
-                    for n in fuzz.x:
-                        if value == fuzz.x[n]:
-                            value = fuzz.y[n]
-                            print (value)
-                        else:
-                            n += 1
-                else:
-                    i += 1
 
 
+def fuzzy_app (app, dic_fuzz):
+    data = app.data
+    for i in range(len(data)):
+        for fuzzyset in dic_fuzz.values():
+            if data [i][0] == fuzzyset.var:
+            
+                fuzzy_values = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
+                print (data[i][0])
+                print (fuzzy_values)
+        
+            # Donde 'attr_index' corresponde al índice del atributo que deseas fuzzificar en 'app.data'
+            # 'fuzzy_values' contendrá los grados de pertenencia del valor de 'app.data[attr_index]' a los conjuntos difusos de 'fuzzyset'
+            # Puedes utilizar estos valores para tomar decisiones basadas en lógica difusa
 
-        #for 
-        #app.printApplication()
 
-         
+lista_reglas = readRulesFile()
 
-main()
+lista_app = readApplicationsFile()
+
+dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
+#dic_fuzz.printFuzzySetsDict()
+#print (lista_app)
+for app in lista_app:
+    fuzzy_app(app, dic_fuzz)
 
 
-
+# Suponiendo que 'applications' es tu lista de objetos 'applications' y 'fuzzysets' es tu diccionario de fuzzysets
