@@ -6,8 +6,12 @@ from MFIS_Classes import *
 
 
 
-
-            
+# Definir los límites de los trapecios
+x = np.arange(0, 100, 1)
+trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
+trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
+trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
+        
 
 
 def reglas (dic_fuzz, lista_reglas):
@@ -48,7 +52,19 @@ def riesgos (lista_reglas):
         elif nivel == "Risk=HighR":
             r_high.append(regla.strength)
     print ("Los riesgos para esta solicitud son: Risk Low = ", np.amax(r_low), " Risk Mid = ", np.amax(r_mid), " Risk High = ", np.amax(r_high))
+    
 
+    
+    # Calcular las áreas de los trapecios
+    area_total = np.trapz(trapecio_low, x) + np.trapz(trapecio_mid, x) + np.trapz(trapecio_high, x)
+
+    # Aplicar los porcentajes ponderados a cada área
+    area_ponderada_low = np.trapz(trapecio_low, x) * np.amax(r_low) / np.trapz(trapecio_low, x)
+    area_ponderada_mid = np.trapz(trapecio_mid, x) * np.amax(r_mid) / np.trapz(trapecio_mid, x)
+    area_ponderada_high = np.trapz(trapecio_high, x) * np.amax(r_high) / np.trapz(trapecio_high, x)
+    
+    areaabsoluta = (np.trapz(trapecio_high, x)*area_ponderada_high + np.trapz(trapecio_low, x) * area_ponderada_low + np.trapz(trapecio_mid, x) * area_ponderada_mid)/area_total
+    print ("el porcentaje de riesgo para esta solicitud es del" ,areaabsoluta *100, "%")
     return
 
 
@@ -61,7 +77,9 @@ def fuzzy_app (app, dic_fuzz):
             if data [i][0] == fuzzyset.var:
             
                 fuzzyset.memDegree = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
+               
                 #print (fuzzyset.var, fuzzyset.label, fuzzyset.memDegree)
+             
                 #el memDegree de cada atributo es el valor fuzzificao
                 
     return
@@ -103,7 +121,7 @@ plt.plot(x, trapecio_low, 'b', linewidth=1.5, label='Trapecio')
 plt.fill_between(x, trapecio_mid, 0, alpha=0.3)
 plt.fill_between(x, trapecio_high, 0, alpha=0.3)
 plt.fill_between(x, trapecio_low, 0, alpha=0.3)
-plt.scatter(CentroGravedadTotal, area_High/100, color='red', label='Centro gravedad')
+plt.scatter(CentroGravedadTotal, 0.5, color='red', label='Centro gravedad')
 plt.title('Conjunto Difuso Trapezoidal')
 plt.ylabel('Pertenencia')
 plt.xlabel('Valor')
@@ -117,5 +135,4 @@ for app in lista_app:
     reglas(dic_fuzz, lista_reglas)
     riesgos(lista_reglas)
     print()
-
 
