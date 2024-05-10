@@ -1,0 +1,96 @@
+import numpy as np
+import skfuzzy as skf
+import matplotlib.pyplot as plt 
+from MFIS_Read_Functions import *
+from MFIS_Classes import *
+
+
+
+
+            
+
+
+def reglas (dic_fuzz, lista_reglas):
+    for regla in lista_reglas:
+        for setid in regla.antecedent:
+            valor_fuzz = dic_fuzz[setid].memDegree
+            #print ("Para el fuzzyset:", setid, " el  valor fuzzificao es : ", valor_fuzz)
+            if regla.strength == 0: #metemos a cada regla el valor fuzzificao que debería tener el riesgo (el menor valor de los valores fuzzificaos)
+                regla.strength = valor_fuzz
+            elif dic_fuzz[setid].memDegree < regla.strength: #filtramos en el diccionario en base a los setids que haya en antecedente
+                regla.strength = valor_fuzz
+            else:
+                pass
+    return
+        #print (regla.consequent, regla.strength)
+
+
+
+
+# primera aplicacion = 58 y algo %
+# trap.mf
+# np.minimum(trapecio del risk low , valor del risk low para cada aplicacion)
+# np.maximum(para combinar los trapecios)
+# sacar el centro
+
+#def 
+
+def riesgos (lista_reglas):
+    r_low = []
+    r_mid = []
+    r_high = []
+    for regla in lista_reglas:
+        nivel = regla.consequent
+        if nivel == "Risk=LowR":
+            r_low.append(regla.strength)
+        elif nivel == "Risk=MediumR":
+            r_mid.append(regla.strength)
+        elif nivel == "Risk=HighR":
+            r_high.append(regla.strength)
+    print ("Los riesgos para esta solicitud son: Risk Low = ", np.amax(r_low), " Risk Mid = ", np.amax(r_mid), " Risk High = ", np.amax(r_high))
+
+    return
+
+
+
+
+def fuzzy_app (app, dic_fuzz):
+    data = app.data
+    for i in range(len(data)):
+        for fuzzyset in dic_fuzz.values():
+            if data [i][0] == fuzzyset.var:
+            
+                fuzzyset.memDegree = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
+                #print (fuzzyset.var, fuzzyset.label, fuzzyset.memDegree)
+                #el memDegree de cada atributo es el valor fuzzificao
+                
+    return
+
+
+
+lista_reglas = readRulesFile()
+
+lista_app = readApplicationsFile()
+
+dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
+
+x = np.arange(0, 100, 1)
+trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
+trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
+trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
+
+# Para visualizar los trapecios
+plt.figure()
+plt.plot(x, trapecio_high, 'b', linewidth=1.5, label='Trapecio')
+plt.title('Conjunto Difuso Trapezoidal')
+plt.ylabel('Pertenencia')
+plt.xlabel('Valor')
+plt.legend()
+plt.show()
+
+for app in lista_app:
+    print ()
+    print (app.appId)
+    fuzzy_app(app, dic_fuzz) #tengo los valores fuzzificaos para cada fuzzyset (Age Low, Age Mid...)
+    reglas(dic_fuzz, lista_reglas)
+    riesgos(lista_reglas)
