@@ -79,9 +79,31 @@ trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
 trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
 trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
 
+
+#AREAS
+area_Mid = np.trapz(trapecio_mid, x)
+area_Low = np.trapz(trapecio_low, x)
+area_High = np.trapz(trapecio_high, x)
+
+CentroGravedadMid = np.trapz(x * trapecio_mid, x) / area_Mid
+CentroGravedadLow = np.trapz(x * trapecio_low, x) / area_Low
+CentroGravedadHigh = np.trapz(x * trapecio_high, x) / area_High
+
+CentroGravedadTotal = (area_Mid*CentroGravedadMid + CentroGravedadLow*area_Low + area_High*CentroGravedadHigh)/(area_Mid + area_High + area_Low)
+print("Centro de Gravedad Total en x:", CentroGravedadTotal)
+#Para aumentar el numero de trapecios y cambiar el centro de gravedad se suman sus areas en el denominador y se suman area por centro de gravedad en numerador
+
+
+
 # Para visualizar los trapecios
 plt.figure()
+plt.plot(x, trapecio_mid, 'b', linewidth=1.5, label='Trapecio')
 plt.plot(x, trapecio_high, 'b', linewidth=1.5, label='Trapecio')
+plt.plot(x, trapecio_low, 'b', linewidth=1.5, label='Trapecio')
+plt.fill_between(x, trapecio_mid, 0, alpha=0.3)
+plt.fill_between(x, trapecio_high, 0, alpha=0.3)
+plt.fill_between(x, trapecio_low, 0, alpha=0.3)
+plt.scatter(CentroGravedadTotal, area_High/100, color='red', label='Centro gravedad')
 plt.title('Conjunto Difuso Trapezoidal')
 plt.ylabel('Pertenencia')
 plt.xlabel('Valor')
@@ -94,3 +116,6 @@ for app in lista_app:
     fuzzy_app(app, dic_fuzz) #tengo los valores fuzzificaos para cada fuzzyset (Age Low, Age Mid...)
     reglas(dic_fuzz, lista_reglas)
     riesgos(lista_reglas)
+    print()
+
+
