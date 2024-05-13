@@ -48,8 +48,8 @@ def riesgos (lista_reglas, trapecio_low, trapecio_mid, trapecio_high, x):
     combo = np.maximum(low, np.maximum(mid, high))
     centroide = round(np.sum(x * combo) / np.sum(combo), 2)
 
-    print ("el porcentaje de riesgo para esta solicitud es del" , centroide, "%")
-    return
+    return ("el porcentaje de riesgo para esta solicitud es del " + str(centroide) + " %")
+
 
 
 
@@ -63,7 +63,7 @@ def fuzzy_app (app, dic_fuzz):
                 fuzzyset.memDegree = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
                 
                 #print (fuzzyset.var, fuzzyset.label, fuzzyset.memDegree)
-             
+            
                 #el memDegree de cada atributo es el valor fuzzificao
                 
     return
@@ -83,14 +83,18 @@ trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
 trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
 trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
 
+output = ''
 
 for app in lista_app:
-    print ()
-    print (app.appId)
-    fuzzy_app(app, dic_fuzz) # tengo los valores fuzzificaos para cada fuzzyset (Age Low, Age Mid...)
+    output += f"\n{app.appId}\n"
+    fuzzy_app(app, dic_fuzz)
     reglas(dic_fuzz, lista_reglas)
-    riesgos(lista_reglas, trapecio_low, trapecio_mid, trapecio_high, x)
+    output += riesgos(lista_reglas, trapecio_low, trapecio_mid, trapecio_high, x)
     lista_reglas = readRulesFile()
-    print()
+    output += "\n"
 
-#dic_fuzz.printFuzzySetsDict()
+# Crear un archivo de texto con la salida del último bucle for
+with open('Files/Results.txt', 'w') as archivo:
+    archivo.write(output)
+
+
