@@ -14,13 +14,11 @@ def reglas (dic_fuzz, lista_reglas):
     for regla in lista_reglas:
         for setid in regla.antecedent:
             valor_fuzz = dic_fuzz[setid].memDegree
-            #print ("Para el fuzzyset:", setid, " el  valor fuzzificao es : ", valor_fuzz)
             if regla.strength == -10: #metemos a cada regla el valor fuzzificao que debería tener el riesgo (el menor valor de los valores fuzzificaos)
                 regla.strength = valor_fuzz
             elif valor_fuzz < regla.strength: #filtramos en el diccionario en base a los setids que haya en antecedente
                 regla.strength = valor_fuzz
     return
-        #print (regla.consequent, regla.strength)
 
 
 
@@ -59,12 +57,7 @@ def fuzzy_app (app, dic_fuzz):
     for i in range(len(data)):
         for fuzzyset in dic_fuzz.values():
             if data [i][0] == fuzzyset.var:
-            
                 fuzzyset.memDegree = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
-                
-                #print (fuzzyset.var, fuzzyset.label, fuzzyset.memDegree)
-            
-                #el memDegree de cada atributo es el valor fuzzificao
                 
     return
 
