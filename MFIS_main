@@ -6,11 +6,7 @@ from MFIS_Classes import *
 
 
 
-# Definir los límites de los trapecios
-x = np.arange(0, 100, 1)
-trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
-trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
-trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
+
         
 
 
@@ -19,27 +15,17 @@ def reglas (dic_fuzz, lista_reglas):
         for setid in regla.antecedent:
             valor_fuzz = dic_fuzz[setid].memDegree
             #print ("Para el fuzzyset:", setid, " el  valor fuzzificao es : ", valor_fuzz)
-            if regla.strength == 0: #metemos a cada regla el valor fuzzificao que debería tener el riesgo (el menor valor de los valores fuzzificaos)
+            if regla.strength == -10: #metemos a cada regla el valor fuzzificao que debería tener el riesgo (el menor valor de los valores fuzzificaos)
                 regla.strength = valor_fuzz
-            elif dic_fuzz[setid].memDegree < regla.strength: #filtramos en el diccionario en base a los setids que haya en antecedente
+            elif valor_fuzz < regla.strength: #filtramos en el diccionario en base a los setids que haya en antecedente
                 regla.strength = valor_fuzz
-            else:
-                pass
     return
         #print (regla.consequent, regla.strength)
 
 
 
 
-# primera aplicacion = 58 y algo %
-# trap.mf
-# np.minimum(trapecio del risk low , valor del risk low para cada aplicacion)
-# np.maximum(para combinar los trapecios)
-# sacar el centro
-
-#def 
-
-def riesgos (lista_reglas):
+def riesgos (lista_reglas, trapecio_low, trapecio_mid, trapecio_high, x):
     r_low = []
     r_mid = []
     r_high = []
@@ -51,20 +37,18 @@ def riesgos (lista_reglas):
             r_mid.append(regla.strength)
         elif nivel == "Risk=HighR":
             r_high.append(regla.strength)
+
+        
     print ("Los riesgos para esta solicitud son: Risk Low = ", np.amax(r_low), " Risk Mid = ", np.amax(r_mid), " Risk High = ", np.amax(r_high))
     
+    low = np.minimum (np.amax(r_low), trapecio_low)
+    mid = np.minimum (np.amax(r_mid), trapecio_mid)
+    high = np.minimum (np.amax(r_high), trapecio_high)
 
-    
-    # Calcular las áreas de los trapecios
-    area_total = np.trapz(trapecio_low, x) + np.trapz(trapecio_mid, x) + np.trapz(trapecio_high, x)
+    combo = np.maximum(low, np.maximum(mid, high))
+    centroide = round(np.sum(x * combo) / np.sum(combo), 2)
 
-    # Aplicar los porcentajes ponderados a cada área
-    area_ponderada_low = np.trapz(trapecio_low, x) * np.amax(r_low) / np.trapz(trapecio_low, x)
-    area_ponderada_mid = np.trapz(trapecio_mid, x) * np.amax(r_mid) / np.trapz(trapecio_mid, x)
-    area_ponderada_high = np.trapz(trapecio_high, x) * np.amax(r_high) / np.trapz(trapecio_high, x)
-    
-    areaabsoluta = (np.trapz(trapecio_high, x)*area_ponderada_high + np.trapz(trapecio_low, x) * area_ponderada_low + np.trapz(trapecio_mid, x) * area_ponderada_mid)/area_total
-    print ("el porcentaje de riesgo para esta solicitud es del" ,areaabsoluta *100, "%")
+    print ("el porcentaje de riesgo para esta solicitud es del" , centroide, "%")
     return
 
 
@@ -77,7 +61,7 @@ def fuzzy_app (app, dic_fuzz):
             if data [i][0] == fuzzyset.var:
             
                 fuzzyset.memDegree = skf.interp_membership(fuzzyset.x, fuzzyset.y, data[i][1])
-               
+                
                 #print (fuzzyset.var, fuzzyset.label, fuzzyset.memDegree)
              
                 #el memDegree de cada atributo es el valor fuzzificao
@@ -92,47 +76,21 @@ lista_app = readApplicationsFile()
 
 dic_fuzz = readFuzzySetsFile('Files/InputVarSets.txt')
 
+
+# Definir los límites de los trapecios
 x = np.arange(0, 100, 1)
 trapecio_low = skf.trapmf(x, [-20, -10, 30, 50])
 trapecio_mid = skf.trapmf(x, [10, 40, 70, 90])
 trapecio_high = skf.trapmf(x, [50, 70, 100, 111])
 
 
-#AREAS
-area_Mid = np.trapz(trapecio_mid, x)
-area_Low = np.trapz(trapecio_low, x)
-area_High = np.trapz(trapecio_high, x)
-
-CentroGravedadMid = np.trapz(x * trapecio_mid, x) / area_Mid
-CentroGravedadLow = np.trapz(x * trapecio_low, x) / area_Low
-CentroGravedadHigh = np.trapz(x * trapecio_high, x) / area_High
-
-CentroGravedadTotal = (area_Mid*CentroGravedadMid + CentroGravedadLow*area_Low + area_High*CentroGravedadHigh)/(area_Mid + area_High + area_Low)
-print("Centro de Gravedad Total en x:", CentroGravedadTotal)
-#Para aumentar el numero de trapecios y cambiar el centro de gravedad se suman sus areas en el denominador y se suman area por centro de gravedad en numerador
-
-
-
-# Para visualizar los trapecios
-plt.figure()
-plt.plot(x, trapecio_mid, 'b', linewidth=1.5, label='Trapecio')
-plt.plot(x, trapecio_high, 'b', linewidth=1.5, label='Trapecio')
-plt.plot(x, trapecio_low, 'b', linewidth=1.5, label='Trapecio')
-plt.fill_between(x, trapecio_mid, 0, alpha=0.3)
-plt.fill_between(x, trapecio_high, 0, alpha=0.3)
-plt.fill_between(x, trapecio_low, 0, alpha=0.3)
-plt.scatter(CentroGravedadTotal, 0.5, color='red', label='Centro gravedad')
-plt.title('Conjunto Difuso Trapezoidal')
-plt.ylabel('Pertenencia')
-plt.xlabel('Valor')
-plt.legend()
-plt.show()
-
 for app in lista_app:
     print ()
     print (app.appId)
-    fuzzy_app(app, dic_fuzz) #tengo los valores fuzzificaos para cada fuzzyset (Age Low, Age Mid...)
+    fuzzy_app(app, dic_fuzz) # tengo los valores fuzzificaos para cada fuzzyset (Age Low, Age Mid...)
     reglas(dic_fuzz, lista_reglas)
-    riesgos(lista_reglas)
+    riesgos(lista_reglas, trapecio_low, trapecio_mid, trapecio_high, x)
+    lista_reglas = readRulesFile()
     print()
 
+#dic_fuzz.printFuzzySetsDict()

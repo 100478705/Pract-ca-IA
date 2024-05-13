@@ -30,7 +30,7 @@ class Rule:
     ruleName = ""	# name of the rule (str)
     antecedent = []	# list of setids		
     consequent = ""	# just one setid
-    strength = 0	# float
+    strength = -10	# float
     consequentX = []	# output fuzzySet, abscissas
     consequentY = []	# output fuzzySet, ordinates
 
